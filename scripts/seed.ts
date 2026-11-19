@@ -2003,6 +2003,42 @@ This course is still in draft while the cluster examples are rewritten against t
     `Created ${countRows(schema.comments)} lesson comments across ${countRows(schema.comments, isNull(schema.comments.parentId))} threads.`
   );
 
+  // ─── Bookmarks and Notes ───
+  // Each Student's own, on Lessons in Courses they are enrolled in. Emma has
+  // both, so her Saved page shows both lists; Sophia has none, so hers shows
+  // the empty states.
+
+  db.insert(schema.bookmarks)
+    .values([
+      { userId: students[0].id, lessonId: course1LessonIds[2], createdAt: daysAgo(12) },
+      { userId: students[0].id, lessonId: course2LessonIds[1], createdAt: daysAgo(4) },
+      { userId: students[2].id, lessonId: course1LessonIds[0], createdAt: daysAgo(20) },
+    ])
+    .run();
+
+  db.insert(schema.notes)
+    .values([
+      {
+        userId: students[0].id,
+        lessonId: course1LessonIds[2],
+        body: "Rewatch from 4:10 — the part about keys.\nTry the exercise again without peeking.",
+        createdAt: daysAgo(12),
+        updatedAt: daysAgo(3),
+      },
+      {
+        userId: students[2].id,
+        lessonId: course2LessonIds[0],
+        body: "*Status codes* to remember: 201, 204, 409.",
+        createdAt: daysAgo(9),
+        updatedAt: daysAgo(9),
+      },
+    ])
+    .run();
+
+  console.log(
+    `Created ${countRows(schema.bookmarks)} bookmarks and ${countRows(schema.notes)} notes.`
+  );
+
   // ─── Lesson Progress ───
 
   // Helper to mark lessons as complete
@@ -2849,6 +2885,9 @@ This course is still in draft while the cluster examples are rewritten against t
   console.log(`  Enrollments: ${countRows(schema.enrollments)}`);
   console.log(`  Course ratings: ${countRows(schema.courseRatings)}`);
   console.log(`  Lesson comments: ${countRows(schema.comments)}`);
+  console.log(
+    `  Bookmarks: ${countRows(schema.bookmarks)}, notes: ${countRows(schema.notes)}`
+  );
   console.log(
     `  Lesson progress: ${countRows(schema.lessonProgress)} (${countRows(schema.lessonProgress, eq(schema.lessonProgress.status, LessonProgressStatus.Completed))} completed)`
   );
